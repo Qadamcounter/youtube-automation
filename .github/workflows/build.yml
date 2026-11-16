@@ -1,0 +1,53 @@
+name: Build YouTube Automation APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the project files
+        uses: actions/checkout@v4
+
+      - name: Unzip the app project
+        run: unzip -o youtube-automation-app.zip -d proj
+
+      - name: Install Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.9'
+          channel: stable
+
+      - name: Create the Android project shell
+        run: flutter create --platforms=android --project-name paper_toons --org com.papertoons scaffold
+
+      - name: Copy our app into the shell
+        run: |
+          cp -r proj/youtube-automation-app/lib/. scaffold/lib/
+          cp proj/youtube-automation-app/pubspec.yaml scaffold/pubspec.yaml
+          cp proj/youtube-automation-app/pubspec.lock scaffold/pubspec.lock
+          cp -r proj/youtube-automation-app/assets scaffold/assets
+          cp proj/youtube-automation-app/android/app/src/main/AndroidManifest.xml scaffold/android/app/src/main/AndroidManifest.xml
+
+      - name: Download packages
+        working-directory: scaffold
+        run: flutter pub get
+
+      - name: Build the APK
+        working-directory: scaffold
+        run: flutter build apk --release
+
+      - name: Save the APK for download
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-automation-apk
+          path: scaffold/build/app/outputs/flutter-apk/app-release.apk
