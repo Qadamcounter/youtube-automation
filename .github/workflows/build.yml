@@ -16,7 +16,7 @@ jobs:
         run: unzip -o youtube-automation-app.zip -d proj
 
       - name: Assemble the offline voice pack
-        run: cat tts_pack.zip.aa tts_pack.zip.ab > proj/youtube-automation-app/assets/tts_pack.zip
+        run: cat tts_pack.zip.* > proj/youtube-automation-app/assets/tts_pack.zip
 
       - name: Install Java 17
         uses: actions/setup-java@v4
